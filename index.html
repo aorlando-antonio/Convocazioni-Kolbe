@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convocazioni Kolbe</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f6b43">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kolbe">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: una colonna da telefono. Barra schede in alto, elenco al centro, azioni fisse in basso. */
+:root{
+  --bg:#f3f5f1; --surface:#ffffff; --ink:#18221c; --muted:#5f6b63; --line:#d9dfd6;
+  --accent:#1f6b43; --accent-ink:#ffffff; --accent-soft:#e2efe6;
+  --p:#b26a00; --d:#2a5f9e; --c:#1f6b43; --a:#b23a2e; --warn:#b23a2e;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101612; --surface:#1a221d; --ink:#e8eee9; --muted:#9aa79e; --line:#2c3730;
+    --accent:#4fb37c; --accent-ink:#0c140f; --accent-soft:#1f3328;
+    --p:#e0a040; --d:#78a8e0; --c:#5fc08a; --a:#ee7a6c; --warn:#ee7a6c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101612; --surface:#1a221d; --ink:#e8eee9; --muted:#9aa79e; --line:#2c3730;
+  --accent:#4fb37c; --accent-ink:#0c140f; --accent-soft:#1f3328;
+  --p:#e0a040; --d:#78a8e0; --c:#5fc08a; --a:#ee7a6c; --warn:#ee7a6c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.35}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 150px}
+header.top{padding:18px 0 10px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:.01em;margin:0;text-transform:uppercase;line-height:1}
+.sub{color:var(--muted);font-size:13px}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}
+nav.tabs a{flex:1;text-align:center;padding:9px 6px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:15px}
+nav.tabs a.on{background:var(--accent);color:var(--accent-ink)}
+section.view{display:none;padding-top:14px}
+section.view.on{display:block}
+.note{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:14px;margin:12px 0 0}
+.note.bad{color:var(--warn)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields .wide{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:500}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;width:100%;min-width:0}
+textarea{min-height:170px;resize:vertical}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:10px 14px;font-weight:600}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.danger{color:var(--warn)}
+button:disabled{opacity:.45;cursor:default}
+.summary{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:14px 0 4px}
+.count{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.count small{font-size:18px;color:var(--muted);font-weight:600}
+.count.over{color:var(--warn)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid currentColor;font-variant-numeric:tabular-nums;white-space:nowrap}
+.r-P{color:var(--p)} .r-D{color:var(--d)} .r-C{color:var(--c)} .r-A{color:var(--a)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-left:auto}
+.seg button{border:0;border-radius:0;padding:6px 10px;font-size:13px;background:var(--surface);color:var(--muted)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+h2{font-family:var(--display);font-size:18px;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 span{font-family:var(--body);font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:500}
+.row.sel{border-color:var(--accent);background:var(--accent-soft)}
+.num{flex:none;width:36px;height:36px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.row.sel .num{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.who{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.who b{font-weight:600;overflow-wrap:anywhere}
+.who i{font-style:normal;font-size:12px;font-weight:600}
+.pres{flex:none;width:74px;text-align:right;font-size:12px;color:var(--muted)}
+.pres strong{font-family:var(--display);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.bar{height:4px;border-radius:2px;background:var(--line);margin-top:3px;overflow:hidden}
+.bar div{height:100%;background:var(--muted)}
+.tick{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700;color:transparent}
+.row.sel .tick{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.empty{color:var(--muted);padding:18px 0;font-size:15px}
+.actions{margin:10px 0 4px}
+.actions div{display:flex;gap:8px}
+.actions button{flex:1}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.match{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.match .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.match .hd b{font-family:var(--display);font-size:20px;text-transform:uppercase}
+.match p{margin:0;font-size:14px;color:var(--muted)}
+.match button{align-self:flex-start;padding:6px 10px;font-size:13px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:16px;width:min(92vw,440px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{font-family:var(--display);font-size:22px;text-transform:uppercase;margin:0 0 12px}
+dialog form{display:flex;flex-direction:column;gap:12px}
+dialog p{margin:0;font-size:15px}
+.stepper{display:flex;gap:6px}
+.stepper button{flex:none;width:44px;padding:10px 0;font-size:18px}
+.dbtn{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.dbtn .left{margin-right:auto}
+.gate{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:14px;display:flex;flex-direction:column;gap:12px}
+.gate p{margin:0;font-size:15px}
+.gate h2{margin:0}
+.gate .btns{display:flex;gap:8px;flex-wrap:wrap}
+body:not(.locked) .gate{display:none}
+body.locked nav.tabs,body.locked section.view,body.locked #note{display:none!important}
+.whoBar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 0 8px;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.whoBar button{padding:4px 10px;font-size:13px;flex:none}
+.acc{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.acc h2{margin:0}
+.acc p{margin:0;font-size:14px;color:var(--muted)}
+.acc ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.acc li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;overflow-wrap:anywhere}
+.acc li button{padding:4px 10px;font-size:13px;flex:none}
+.acc form{display:flex;gap:8px}
+.acc form input{flex:1}
+#toast{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;display:none;z-index:20;max-width:90vw}
+</style>
+</head>
+<body class="locked">
+<div class="wrap">
+  <header class="top">
+    <h1>Kolbe · Calcio a 7</h1>
+    <span class="sub">Campionato CSI</span>
+  </header>
+  <nav class="tabs" aria-label="Sezioni">
+    <a href="#convocazione" data-v="convocazione">Convocazione</a>
+    <a href="#rosa" data-v="rosa">Rosa</a>
+    <a href="#partite" data-v="partite">Partite</a>
+  </nav>
+  <div id="who" class="whoBar" hidden></div>
+  <div id="gate" class="gate"><p>Collegamento in corso…</p></div>
+  <div id="note" class="note" hidden></div>
+
+  <section class="view" id="v-convocazione">
+    <div class="fields">
+      <label class="wide">Avversario<input id="f-avv" type="text" autocomplete="off" placeholder="Nome della squadra"></label>
+      <label>Data<input id="f-data" type="date"></label>
+      <label>Posti in distinta<input id="f-max" type="number" min="1" max="30" inputmode="numeric"></label>
+    </div>
+    <div class="summary">
+      <div class="count" id="count"></div>
+      <div class="chips" id="roleCount"></div>
+      <div class="seg" role="group" aria-label="Ordina">
+        <button type="button" id="s-ruolo">Per ruolo</button>
+        <button type="button" id="s-pres">Meno presenze</button>
+      </div>
+    </div>
+    <div class="actions" id="actions">
+  <div>
+    <button type="button" id="b-copy">Elenco per WhatsApp</button>
+    <button type="button" class="primary" id="b-reg">Registra partita</button>
+  </div>
+</div>
+    <div id="convList"></div>
+  </section>
+
+  <section class="view" id="v-rosa">
+    <div class="toolbar">
+      <button type="button" class="primary" id="b-add">Aggiungi giocatore</button>
+      <button type="button" id="b-bulk">Incolla un elenco</button>
+    </div>
+    <div id="rosaList"></div>
+    <div id="accessi"></div>
+  </section>
+
+  <section class="view" id="v-partite">
+    <div id="matchList"></div>
+  </section>
+</div>
+
+<div id="toast" role="status"></div>
+
+<dialog id="dlgP">
+  <form id="formP">
+    <h3 id="dlgPt">Giocatore</h3>
+    <label>Nome<input id="p-nome" type="text" autocomplete="off" required></label>
+    <div class="fields">
+      <label>Numero di maglia<input id="p-num" type="number" min="0" max="99" inputmode="numeric"></label>
+      <label>Ruolo<select id="p-ruolo">
+        <option value="P">Portiere</option><option value="D">Difensore</option>
+        <option value="C">Centrocampista</option><option value="A">Attaccante</option>
+      </select></label>
+    </div>
+    <label>Partite giocate finora
+      <span class="stepper">
+        <button type="button" id="p-minus" aria-label="Una in meno">−</button>
+        <input id="p-pres" type="number" min="0" max="99" inputmode="numeric">
+        <button type="button" id="p-plus" aria-label="Una in più">+</button>
+      </span>
+    </label>
+    <div class="dbtn">
+      <button type="button" class="danger left" id="p-del">Elimina</button>
+      <button type="button" id="p-cancel">Annulla</button>
+      <button type="submit" class="primary">Salva</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgB">
+  <form id="formB">
+    <h3>Incolla un elenco</h3>
+    <p>Un giocatore per riga. Puoi mettere il numero davanti e il ruolo dopo la virgola (P, D, C, A), poi le presenze. Esempio: <b>10 Rossi Marco, A, 4</b></p>
+    <textarea id="b-text" aria-label="Elenco giocatori"></textarea>
+    <div class="dbtn">
+      <button type="button" id="b-cancel">Annulla</button>
+      <button type="submit" class="primary">Aggiungi alla rosa</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgT">
+  <form method="dialog">
+    <h3>Elenco per WhatsApp</h3>
+    <textarea id="t-text" readonly aria-label="Testo della convocazione"></textarea>
+    <div class="dbtn">
+      <button type="button" id="t-copy" class="primary">Copia</button>
+      <button type="submit">Chiudi</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgC">
+  <form id="formC">
+    <h3 id="c-title"></h3>
+    <p id="c-msg"></p>
+    <div class="dbtn">
+      <button type="button" id="c-no">Annulla</button>
+      <button type="submit" class="primary" id="c-yes">Conferma</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+"use strict";
+var ROLES={P:{n:"Portiere",pl:"Portieri"},D:{n:"Difensore",pl:"Difensori"},C:{n:"Centrocampista",pl:"Centrocampisti"},A:{n:"Attaccante",pl:"Attaccanti"}};
+var ORDER=["P","D","C","A"];
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+var S={players:[],matches:[],draft:{sel:[],avv:"",data:today(),max:14},sort:"ruolo",db:null,loaded:false,note:"",bad:false};
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function byId(id){for(var i=0;i<S.players.length;i++)if(S.players[i].id===id)return S.players[i];return null;}
+function pres(p){var n=Number(p.presenze);return isFinite(n)&&n>0?Math.round(n):0;}
+function numOf(p){return (p.numero===null||p.numero===undefined||p.numero==="")?null:Number(p.numero);}
+function role(p){return ROLES[p.ruolo]?p.ruolo:"C";}
+function fmtDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||""))return s||"";var d=new Date(s+"T12:00:00");return d.toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});}
+function cmpName(a,b){return String(a.nome).localeCompare(String(b.nome),"it");}
+function cmpPres(a,b){return pres(a)-pres(b)||cmpName(a,b);}
+var toastT;
+function toast(m){var t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){t.style.display="none";},2600);}
+function fail(){toast("Salvataggio non riuscito. Riprova.");}
+
+/* ---------- salvataggio ---------- */
+function newId(){return S.db?S.db.collection("giocatori").doc().id:"l"+Math.random().toString(36).slice(2,10);}
+function putPlayer(id,data){
+  var p=byId(id);
+  if(p){Object.keys(data).forEach(function(k){p[k]=data[k];});}else{var o={id:id};Object.keys(data).forEach(function(k){o[k]=data[k];});S.players.push(o);}
+  render();
+  if(S.db)return S.db.doc("giocatori/"+id).set(data).catch(fail);
+  return Promise.resolve();
+}
+function delPlayer(id){
+  S.players=S.players.filter(function(p){return p.id!==id;});
+  S.draft.sel=S.draft.sel.filter(function(x){return x!==id;});
+  render();saveDraft();
+  if(S.db)S.db.doc("giocatori/"+id).delete().catch(fail);
+}
+function plain(p){return {nome:p.nome,ruolo:role(p),numero:numOf(p),presenze:pres(p)};}
+var draftT=null,draftChain=Promise.resolve();
+function saveDraft(){
+  if(!S.db)return;
+  clearTimeout(draftT);
+  draftT=setTimeout(function(){
+    draftT=null;
+    var body={sel:S.draft.sel.slice(),avv:S.draft.avv,data:S.draft.data,max:S.draft.max};
+    draftChain=draftChain.then(function(){return S.db.doc("stato/convocazione").set(body);}).catch(fail);
+  },700);
+}
+
+/* ---------- disegno ---------- */
+function rowHtml(p,opts){
+  var n=numOf(p),r=role(p),mx=opts.max||1,sel=opts.sel;
+  return '<li><button type="button" class="row'+(sel?" sel":"")+'" data-id="'+esc(p.id)+'"'+(opts.pick?' aria-pressed="'+(sel?"true":"false")+'"':"")+'>'+
+    '<span class="num">'+(n===null?"–":esc(n))+'</span>'+
+    '<span class="who"><b>'+esc(p.nome)+'</b><i class="r-'+r+'">'+ROLES[r].n+'</i></span>'+
+    '<span class="pres"><strong>'+pres(p)+'</strong> pres.<div class="bar"><div style="width:'+Math.round(pres(p)/mx*100)+'%"></div></div></span>'+
+    (opts.pick?'<span class="tick" aria-hidden="true">✓</span>':"")+
+    '</button></li>';
+}
+function maxPres(){var m=1;S.players.forEach(function(p){if(pres(p)>m)m=pres(p);});return m;}
+function selected(){return S.draft.sel.map(byId).filter(Boolean);}
+function renderConv(){
+  var sel=selected(),mx=maxPres(),max=S.draft.max||14;
+  var c=$("count");c.innerHTML=sel.length+' <small>/ '+max+' convocati</small>';c.className="count"+(sel.length>max?" over":"");
+  $("roleCount").innerHTML=ORDER.map(function(r){var k=sel.filter(function(p){return role(p)===r;}).length;return '<span class="chip r-'+r+'">'+r+' '+k+'</span>';}).join("");
+  $("s-ruolo").className=S.sort==="ruolo"?"on":"";$("s-pres").className=S.sort==="pres"?"on":"";
+  var h="";
+  if(!S.players.length){
+    h='<p class="empty">'+(S.loaded?'La rosa è vuota. Apri la scheda Rosa e aggiungi i giocatori.':'Carico la rosa…')+'</p>';
+  }else if(S.sort==="pres"){
+    h='<h2>Tutti <span>chi ha giocato meno è in alto</span></h2><ul class="list">'+S.players.slice().sort(cmpPres).map(function(p){return rowHtml(p,{pick:true,sel:S.draft.sel.indexOf(p.id)>=0,max:mx});}).join("")+'</ul>';
+  }else{
+    ORDER.forEach(function(r){
+      var g=S.players.filter(function(p){return role(p)===r;}).sort(cmpPres);
+      if(!g.length)return;
+      var k=g.filter(function(p){return S.draft.sel.indexOf(p.id)>=0;}).length;
+      h+='<h2 class="r-'+r+'">'+ROLES[r].pl+' <span>'+k+' scelti su '+g.length+'</span></h2><ul class="list">'+g.map(function(p){return rowHtml(p,{pick:true,sel:S.draft.sel.indexOf(p.id)>=0,max:mx});}).join("")+'</ul>';
+    });
+  }
+  $("convList").innerHTML=h;
+  $("b-reg").disabled=!sel.length;$("b-copy").disabled=!sel.length;
+  var a=document.activeElement;
+  if(a!==$("f-avv"))$("f-avv").value=S.draft.avv||"";
+  if(a!==$("f-data"))$("f-data").value=S.draft.data||"";
+  if(a!==$("f-max"))$("f-max").value=max;
+}
+function renderRosa(){
+  var mx=maxPres(),h="";
+  if(!S.players.length){h='<p class="empty">'+(S.loaded?'Nessun giocatore. Aggiungili uno alla volta oppure incolla l\'elenco.':'Carico la rosa…')+'</p>';}
+  else{
+    var list=S.players.slice().sort(function(a,b){var x=numOf(a),y=numOf(b);if(x===null&&y===null)return cmpName(a,b);if(x===null)return 1;if(y===null)return -1;return x-y||cmpName(a,b);});
+    h='<h2>'+list.length+' giocatori <span>tocca per modificare</span></h2><ul class="list">'+list.map(function(p){return rowHtml(p,{max:mx});}).join("")+'</ul>';
+  }
+  $("rosaList").innerHTML=h;
+}
+function renderMatches(){
+  var h="";
+  if(!S.matches.length){h='<p class="empty">'+(S.loaded?'Nessuna partita registrata da qui. Quando registri una convocazione, la trovi in questo elenco e ogni convocato prende una presenza.':'Carico le partite…')+'</p>';}
+  else{
+    h='<ul class="list">'+S.matches.slice().sort(function(a,b){return String(b.data).localeCompare(String(a.data));}).map(function(m){
+      var names=(m.convocati||[]).map(function(id,i){var p=byId(id);return p?p.nome:((m.nomi||[])[i]||"?");});
+      return '<li class="match"><div class="hd"><b>'+esc(m.avversario||"Avversario non indicato")+'</b><span class="sub">'+esc(fmtDate(m.data))+'</span></div><p>'+names.length+' convocati: '+esc(names.join(", "))+'</p><button type="button" class="danger" data-del="'+esc(m.id)+'">Elimina e togli le presenze</button></li>';
+    }).join("")+'</ul>';
+  }
+  $("matchList").innerHTML=h;
+}
+var KEY="kolbe-convocazioni-v1";
+function persist(){try{localStorage.setItem(KEY,JSON.stringify({players:S.players,matches:S.matches,draft:S.draft}));}catch(e){S.note="Il telefono non permette di salvare i dati: quello che cambi resta solo finché la pagina è aperta.";S.bad=true;}}
+function render(){
+  renderConv();renderRosa();renderMatches();renderAcc();
+  var n=$("note");n.hidden=!S.note;n.textContent=S.note;n.className="note"+(S.bad?" bad":"");
+}
+function route(){
+  var v=(location.hash||"").slice(1);if(["convocazione","rosa","partite"].indexOf(v)<0)v="convocazione";
+  document.querySelectorAll("section.view").forEach(function(s){s.classList.toggle("on",s.id==="v-"+v);});
+  document.querySelectorAll("nav.tabs a").forEach(function(a){a.classList.toggle("on",a.dataset.v===v);});
+}
+
+/* ---------- convocazione ---------- */
+$("convList").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-id]");if(!b)return;
+  var id=b.dataset.id,i=S.draft.sel.indexOf(id);
+  if(i>=0)S.draft.sel.splice(i,1);else S.draft.sel.push(id);
+  renderConv();saveDraft();
+});
+$("f-avv").addEventListener("input",function(){S.draft.avv=this.value;saveDraft();});
+$("f-data").addEventListener("change",function(){S.draft.data=this.value;saveDraft();});
+$("f-max").addEventListener("change",function(){var n=parseInt(this.value,10);S.draft.max=n>0&&n<=30?n:14;renderConv();saveDraft();});
+$("s-ruolo").addEventListener("click",function(){S.sort="ruolo";renderConv();});
+$("s-pres").addEventListener("click",function(){S.sort="pres";renderConv();});
+
+function convText(){
+  var sel=selected(),t="Kolbe, convocati"+(S.draft.avv?" contro "+S.draft.avv:"")+(S.draft.data?" ("+fmtDate(S.draft.data)+")":"")+"\n";
+  ORDER.forEach(function(r){
+    var g=sel.filter(function(p){return role(p)===r;}).sort(function(a,b){var x=numOf(a),y=numOf(b);return (x===null?999:x)-(y===null?999:y)||cmpName(a,b);});
+    if(!g.length)return;
+    t+="\n"+ROLES[r].pl+":\n"+g.map(function(p){var n=numOf(p);return (n===null?"":n+" ")+p.nome;}).join("\n")+"\n";
+  });
+  return t+"\nTotale: "+sel.length;
+}
+$("b-copy").addEventListener("click",function(){$("t-text").value=convText();$("dlgT").showModal();});
+$("t-copy").addEventListener("click",function(){
+  var ta=$("t-text");
+  var done=function(){toast("Testo copiato");};
+  var manual=function(){ta.focus();ta.select();toast("Seleziona il testo e copialo a mano");};
+  try{navigator.clipboard.writeText(ta.value).then(done,manual);}catch(err){manual();}
+});
+
+var confirmCb=null;
+function ask(title,msg,yes,cb){$("c-title").textContent=title;$("c-msg").textContent=msg;$("c-yes").textContent=yes;confirmCb=cb;$("dlgC").showModal();}
+$("formC").addEventListener("submit",function(e){e.preventDefault();$("dlgC").close();var cb=confirmCb;confirmCb=null;if(cb)cb();});
+$("c-no").addEventListener("click",function(){confirmCb=null;$("dlgC").close();});
+
+$("b-reg").addEventListener("click",function(){
+  var sel=selected();if(!sel.length)return;
+  ask("Registra partita","Salvo la convocazione"+(S.draft.avv?" contro "+S.draft.avv:"")+" e aggiungo una presenza a "+sel.length+" giocatori. La selezione viene azzerata.","Registra",function(){
+    var m={data:S.draft.data||today(),avversario:S.draft.avv||"",convocati:sel.map(function(p){return p.id;}),nomi:sel.map(function(p){return p.nome;})};
+    var id=S.db?S.db.collection("partite").doc().id:"l"+Math.random().toString(36).slice(2,10);
+    var local={id:id};Object.keys(m).forEach(function(k){local[k]=m[k];});S.matches.push(local);
+    if(S.db)S.db.doc("partite/"+id).set(m).catch(fail);
+    sel.forEach(function(p){var d=plain(p);d.presenze=pres(p)+1;putPlayer(p.id,d);});
+    S.draft.sel=[];S.draft.avv="";render();saveDraft();
+    toast("Partita registrata");
+  });
+});
+
+/* ---------- rosa ---------- */
+var editId=null;
+function openPlayer(p){
+  editId=p?p.id:null;
+  $("dlgPt").textContent=p?"Modifica giocatore":"Nuovo giocatore";
+  $("p-nome").value=p?p.nome:"";
+  $("p-num").value=p&&numOf(p)!==null?numOf(p):"";
+  $("p-ruolo").value=p?role(p):"C";
+  $("p-pres").value=p?pres(p):0;
+  $("p-del").hidden=!p;
+  $("dlgP").showModal();
+}
+$("b-add").addEventListener("click",function(){openPlayer(null);});
+$("rosaList").addEventListener("click",function(e){var b=e.target.closest("button[data-id]");if(b)openPlayer(byId(b.dataset.id));});
+function stepPres(d){var i=$("p-pres"),n=parseInt(i.value,10)||0;i.value=Math.max(0,n+d);}
+$("p-minus").addEventListener("click",function(){stepPres(-1);});
+$("p-plus").addEventListener("click",function(){stepPres(1);});
+$("p-cancel").addEventListener("click",function(){$("dlgP").close();});
+$("formP").addEventListener("submit",function(e){
+  e.preventDefault();
+  var nome=$("p-nome").value.trim();if(!nome)return;
+  var nv=$("p-num").value.trim(),num=nv===""?null:Math.max(0,Math.min(99,parseInt(nv,10)||0));
+  if(num!==null){var dup=S.players.filter(function(p){return p.id!==editId&&numOf(p)===num;})[0];if(dup)toast("Attenzione: il "+num+" è già di "+dup.nome);}
+  var data={nome:nome,ruolo:$("p-ruolo").value,numero:num,presenze:Math.max(0,parseInt($("p-pres").value,10)||0)};
+  putPlayer(editId||newId(),data);
+  $("dlgP").close();
+});
+$("p-del").addEventListener("click",function(){
+  var p=byId(editId);$("dlgP").close();if(!p)return;
+  ask("Elimina giocatore","Tolgo "+p.nome+" dalla rosa. Le partite già registrate restano.","Elimina",function(){delPlayer(p.id);});
+});
+$("b-bulk").addEventListener("click",function(){$("b-text").value="";$("dlgB").showModal();});
+$("b-cancel").addEventListener("click",function(){$("dlgB").close();});
+var RMAP={P:"P",POR:"P",PORTIERE:"P",D:"D",DIF:"D",DIFENSORE:"D",C:"C",CEN:"C",CC:"C",CENTROCAMPISTA:"C",A:"A",ATT:"A",ATTACCANTE:"A"};
+$("formB").addEventListener("submit",function(e){
+  e.preventDefault();
+  var added=0;
+  $("b-text").value.split(/\r?\n/).forEach(function(line){
+    line=line.trim();if(!line)return;
+    var parts=line.split(/[,;\t]/).map(function(x){return x.trim();});
+    var head=parts[0],num=null,m=head.match(/^(\d{1,2})[\s.\-)]+(.+)$/);
+    if(m){num=parseInt(m[1],10);head=m[2].trim();}
+    if(!head)return;
+    var ruolo="C",pr=0;
+    parts.slice(1).forEach(function(x){var u=x.toUpperCase();if(RMAP[u])ruolo=RMAP[u];else if(/^\d+$/.test(x))pr=parseInt(x,10);});
+    putPlayer(newId(),{nome:head,ruolo:ruolo,numero:num,presenze:pr});added++;
+  });
+  $("dlgB").close();
+  toast(added?added+" giocatori aggiunti":"Nessuna riga valida");
+});
+
+/* ---------- partite ---------- */
+$("matchList").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-del]");if(!b)return;
+  var m=S.matches.filter(function(x){return x.id===b.dataset.del;})[0];if(!m)return;
+  ask("Elimina partita","Cancello la partita"+(m.avversario?" contro "+m.avversario:"")+" e tolgo una presenza ai convocati.","Elimina",function(){
+    S.matches=S.matches.filter(function(x){return x.id!==m.id;});
+    if(S.db)S.db.doc("partite/"+m.id).delete().catch(fail);
+    (m.convocati||[]).forEach(function(id){var p=byId(id);if(p){var d=plain(p);d.presenze=Math.max(0,pres(p)-1);putPlayer(id,d);}});
+    render();
+  });
+});
+
+/* ---------- avvio ---------- */
+window.addEventListener("hashchange",route);
+route();render();
+
+/* ---------- dati online (Firebase) ---------- */
+var TEAM="kolbe",TEAMNAME="Kolbe 2010";
+var SEED={"players":[{"id":"s02","nome":"Amata Alessandro","ruolo":"C","numero":9,"presenze":5},{"id":"s03","nome":"Betalli Paolo","ruolo":"C","numero":4,"presenze":4},{"id":"s04","nome":"Caselli Andrea","ruolo":"C","numero":6,"presenze":3},{"id":"s05","nome":"Fusilli Gabriele","ruolo":"C","numero":10,"presenze":6},{"id":"s06","nome":"Garra Edoardo Giuseppe","ruolo":"C","numero":16,"presenze":6},{"id":"s07","nome":"Marino Valerio Junio Massimo","ruolo":"C","numero":null,"presenze":1},{"id":"s08","nome":"Nastri Federico","ruolo":"C","numero":8,"presenze":4},{"id":"s09","nome":"Orlando Francesco","ruolo":"C","numero":2,"presenze":6},{"id":"s10","nome":"Rivolta Samuele","ruolo":"C","numero":15,"presenze":5},{"id":"s11","nome":"Rossi Carlo","ruolo":"C","numero":7,"presenze":3},{"id":"s12","nome":"Santorelli Andrea","ruolo":"C","numero":14,"presenze":3},{"id":"s13","nome":"Scibetta Francesco","ruolo":"C","numero":18,"presenze":3},{"id":"s14","nome":"Sedda Leonardo","ruolo":"C","numero":13,"presenze":2},{"id":"s15","nome":"Sessa Vitali Andrea","ruolo":"C","numero":3,"presenze":6},{"id":"s16","nome":"Varone Riccardo","ruolo":"C","numero":5,"presenze":6},{"id":"s17","nome":"Venditto Simone","ruolo":"C","numero":1,"presenze":6}],"matches":[{"id":"m20261009","data":"2026-10-09","avversario":"S.Spirito U17","convocati":["s17","s15","s06","s05","s10","s09","s08","s02","s12","s16","s11"],"nomi":["Venditto Simone","Sessa Vitali Andrea","Garra Edoardo Giuseppe","Fusilli Gabriele","Rivolta Samuele","Orlando Francesco","Nastri Federico","Amata Alessandro","Santorelli Andrea","Varone Riccardo","Rossi Carlo"]},{"id":"m20261010","data":"2026-10-10","avversario":"Fortes","convocati":["s17","s15","s06","s05","s10","s09","s13","s02","s12","s16","s11","s07"],"nomi":["Venditto Simone","Sessa Vitali Andrea","Garra Edoardo Giuseppe","Fusilli Gabriele","Rivolta Samuele","Orlando Francesco","Scibetta Francesco","Amata Alessandro","Santorelli Andrea","Varone Riccardo","Rossi Carlo","Marino Valerio Junio Massimo"]},{"id":"m20261017","data":"2026-10-17","avversario":"Spes Aquile","convocati":["s17","s15","s03","s06","s05","s09","s02","s16","s04","s14"],"nomi":["Venditto Simone","Sessa Vitali Andrea","Betalli Paolo","Garra Edoardo Giuseppe","Fusilli Gabriele","Orlando Francesco","Amata Alessandro","Varone Riccardo","Caselli Andrea","Sedda Leonardo"]},{"id":"m20261024","data":"2026-10-24","avversario":"Atlas Asd","convocati":["s17","s09","s15","s10","s03","s16","s13","s08","s14","s06","s05"],"nomi":["Venditto Simone","Orlando Francesco","Sessa Vitali Andrea","Rivolta Samuele","Betalli Paolo","Varone Riccardo","Scibetta Francesco","Nastri Federico","Sedda Leonardo","Garra Edoardo Giuseppe","Fusilli Gabriele"]},{"id":"m20261031","data":"2026-10-31","avversario":"S.Giorgio Dergano","convocati":["s17","s09","s15","s10","s03","s16","s02","s08","s04","s06","s05"],"nomi":["Venditto Simone","Orlando Francesco","Sessa Vitali Andrea","Rivolta Samuele","Betalli Paolo","Varone Riccardo","Amata Alessandro","Nastri Federico","Caselli Andrea","Garra Edoardo Giuseppe","Fusilli Gabriele"]},{"id":"m20261114","data":"2026-11-14","avversario":"Arcobaleno Pavoni Ap","convocati":["s17","s15","s03","s06","s05","s04","s11","s12","s02","s16","s13","s10","s08","s09"],"nomi":["Venditto Simone","Sessa Vitali Andrea","Betalli Paolo","Garra Edoardo Giuseppe","Fusilli Gabriele","Caselli Andrea","Rossi Carlo","Santorelli Andrea","Amata Alessandro","Varone Riccardo","Scibetta Francesco","Rivolta Samuele","Nastri Federico","Orlando Francesco"]}]};
+var FBCONF={"apiKey": "AIzaSyBH5QFcXU9j4KAsaIDwmdIErkIHa93QTx0", "authDomain": "convocazioni-k10.firebaseapp.com", "projectId": "convocazioni-k10", "storageBucket": "convocazioni-k10.firebasestorage.app", "messagingSenderId": "593294651583", "appId": "1:593294651583:web:fae5239dafdfa2097c560a"};
+var LOCAL=null;
+try{var raw=localStorage.getItem(KEY);if(raw){var lx=JSON.parse(raw);if(lx&&Array.isArray(lx.players)&&lx.players.length)LOCAL=lx;}}catch(e){}
+var FBV="https://www.gstatic.com/firebasejs/10.12.2/";
+var F=null,auth=null,fs=null,user=null,team=null,teamSub=null,dataSubs=[];
+S.isAdmin=false;
+function me(){return String(user&&user.email||"").toLowerCase();}
+function base(){return "squadre/"+TEAM+"/";}
+function teamRef(){return F.doc(fs,"squadre/"+TEAM);}
+function wrapDoc(r){return {id:r.id,
+  set:function(d){return F.setDoc(r,d);},
+  delete:function(){return F.deleteDoc(r);},
+  onSnapshot:function(n,e){return F.onSnapshot(r,{includeMetadataChanges:true},function(s){n({exists:s.exists(),data:function(){return s.data();},metadata:s.metadata});},e);}};}
+function makeDb(){return {
+  doc:function(p){return wrapDoc(F.doc(fs,base()+p));},
+  collection:function(p){return {
+    doc:function(id){return wrapDoc(id?F.doc(fs,base()+p,id):F.doc(F.collection(fs,base()+p)));},
+    onSnapshot:function(n,e){return F.onSnapshot(F.collection(fs,base()+p),{includeMetadataChanges:true},function(s){
+      n({docs:s.docs.map(function(d){return {id:d.id,exists:true,data:function(){return d.data();},metadata:d.metadata};}),metadata:s.metadata});},e);}
+  };}
+};}
+
+function gate(kind,msg){
+  var g=$("gate"),h="",em=esc(me());
+  document.body.classList.toggle("locked",!!kind);
+  if(kind==="loading")h='<p>Collegamento in corso…</p>';
+  else if(kind==="login")h='<h2>Accesso</h2><p>Per vedere e modificare la rosa accedi con il tuo account Google. Entra solo chi è stato autorizzato dal responsabile della squadra.</p><div class="btns"><button type="button" class="primary" data-g="login">Accedi con Google</button></div>';
+  else if(kind==="nonattivo"){
+    var src=LOCAL?'Carico la rosa salvata su questo telefono ('+LOCAL.players.length+' giocatori'+(LOCAL.matches&&LOCAL.matches.length?', '+LOCAL.matches.length+' partite':'')+').':(SEED?'Carico la rosa presa dalle distinte ('+SEED.players.length+' giocatori, '+SEED.matches.length+' partite).':'La rosa parte vuota.');
+    h='<h2>Squadra non ancora attiva</h2><p>La squadra '+esc(TEAMNAME)+' non è ancora attiva online. Se sei il responsabile, attivala adesso con l\'account <b>'+em+'</b>: diventi l\'amministratore e decidi tu chi può entrare.</p><p>'+src+'</p><div class="btns"><button type="button" class="primary" data-g="attiva">Attiva la squadra</button><button type="button" data-g="esci">Cambia account</button></div>';
+  }
+  else if(kind==="negato")h='<h2>Accesso non autorizzato</h2><p>L\'account <b>'+em+'</b> non è tra quelli autorizzati per '+esc(TEAMNAME)+'. Chiedi al responsabile di aggiungere questa email, poi tocca Riprova.</p><div class="btns"><button type="button" class="primary" data-g="riprova">Riprova</button><button type="button" data-g="esci">Cambia account</button></div>';
+  else if(kind==="errore")h='<h2>Qualcosa non va</h2><p>'+esc(msg||"Errore di collegamento.")+'</p><div class="btns"><button type="button" class="primary" data-g="riprova">Riprova</button>'+(user?'<button type="button" data-g="esci">Esci</button>':'')+'</div>';
+  if(kind)g.innerHTML=h;
+  var w=$("who");
+  if(user&&!kind){w.hidden=false;w.innerHTML='<span>'+em+(S.isAdmin?' · responsabile':'')+'</span><button type="button" data-g="esci">Esci</button>';}
+  else w.hidden=true;
+}
+function renderAcc(){
+  var box=$("accessi");if(!box)return;
+  if(!S.isAdmin||!team){box.innerHTML="";return;}
+  var mem=(team.membri||[]).slice().sort();
+  box.innerHTML='<div class="acc"><h2>Chi può entrare</h2><p>Aggiungi l\'email Google di ogni allenatore o dirigente. Vedono e modificano rosa e partite, ma non questo elenco.</p><ul>'+
+    (team.admin||[]).map(function(x){return '<li><span>'+esc(x)+'</span><span class="sub">responsabile</span></li>';}).join("")+
+    mem.map(function(x){return '<li><span>'+esc(x)+'</span><button type="button" class="danger" data-rm="'+esc(x)+'">Togli</button></li>';}).join("")+
+    '</ul><form id="accForm"><input id="accMail" type="email" autocomplete="off" placeholder="nome@gmail.com" aria-label="Email da autorizzare"><button type="submit" class="primary">Aggiungi</button></form></div>';
+}
+function saveMembri(list){F.updateDoc(teamRef(),{membri:list}).catch(fail);}
+$("accessi").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-rm]");if(!b||!team)return;
+  var x=b.dataset.rm;
+  ask("Togli accesso","Tolgo l'accesso a "+x+". Non potrà più vedere né modificare la squadra.","Togli",function(){saveMembri((team.membri||[]).filter(function(y){return y!==x;}));});
+});
+$("accessi").addEventListener("submit",function(e){
+  e.preventDefault();if(!team)return;
+  var v=String($("accMail").value||"").trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){toast("Scrivi un'email valida");return;}
+  var list=(team.membri||[]).slice();
+  if(list.indexOf(v)>=0||(team.admin||[]).indexOf(v)>=0){toast("Questa email è già autorizzata");return;}
+  list.push(v);saveMembri(list);$("accMail").value="";toast("Accesso aggiunto per "+v);
+});
+
+function login(){
+  var pr=new F.GoogleAuthProvider();pr.setCustomParameters({prompt:"select_account"});
+  F.signInWithPopup(auth,pr).catch(function(e){
+    var c=e&&e.code||"";
+    if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment")return F.signInWithRedirect(auth,pr);
+    if(c==="auth/popup-closed-by-user"||c==="auth/cancelled-popup-request")return;
+    if(c==="auth/unauthorized-domain"){gate("errore","Questo indirizzo non è tra i domini autorizzati di Firebase. Aggiungi "+location.hostname+" in Authentication → Impostazioni → Domini autorizzati.");return;}
+    gate("errore","Accesso non riuscito ("+c+").");
+  });
+}
+function stopData(){
+  dataSubs.forEach(function(u){try{u();}catch(e){}});dataSubs=[];
+  S.db=null;S.players=[];S.matches=[];S.loaded=false;S.note="";S.bad=false;
+  S.draft={sel:[],avv:"",data:today(),max:14};
+}
+function stopAll(){if(teamSub){try{teamSub();}catch(e){}teamSub=null;}stopData();team=null;S.isAdmin=false;}
+function startData(){
+  S.db=makeDb();S.loaded=false;
+  var timer=setTimeout(function(){S.loaded=true;S.note="Non riesco a raggiungere il server: i dati potrebbero non essere aggiornati. Controlla la connessione.";render();},10000);
+  function ok(snap){if(!snap.metadata.fromCache){clearTimeout(timer);S.note="";S.bad=false;}S.loaded=true;}
+  function dead(e){clearTimeout(timer);S.loaded=true;S.note="Collegamento ai dati interrotto ("+(e&&e.code||"errore")+"). Ricarica la pagina.";S.bad=true;render();}
+  function row(d){var o={id:d.id},x=d.data()||{};Object.keys(x).forEach(function(k){o[k]=x[k];});return o;}
+  dataSubs.push(S.db.collection("giocatori").onSnapshot(function(snap){S.players=snap.docs.map(row);ok(snap);render();},dead));
+  dataSubs.push(S.db.collection("partite").onSnapshot(function(snap){S.matches=snap.docs.map(row);ok(snap);render();},dead));
+  dataSubs.push(S.db.doc("stato/convocazione").onSnapshot(function(snap){
+    if(snap.exists&&!snap.metadata.hasPendingWrites&&!draftT){
+      var x=snap.data()||{};
+      S.draft={sel:Array.isArray(x.sel)?x.sel.slice():[],avv:x.avv||"",data:x.data||today(),max:x.max>0?x.max:14};
+      render();
+    }
+  },function(){}));
+}
+function watchTeam(){
+  gate("loading");
+  teamSub=F.onSnapshot(teamRef(),function(s){
+    if(!s.exists()){if(s.metadata.fromCache)return;team=null;S.isAdmin=false;stopData();render();gate("nonattivo");return;}
+    team=s.data()||{};S.isAdmin=(team.admin||[]).indexOf(me())>=0;
+    if(!S.db)startData();
+    gate(null);render();
+  },function(e){
+    team=null;S.isAdmin=false;stopData();render();
+    if(e&&e.code==="permission-denied")gate("negato");else gate("errore","Collegamento non riuscito ("+(e&&e.code||"errore")+").");
+  });
+}
+function activate(btn){
+  if(btn)btn.disabled=true;
+  F.setDoc(teamRef(),{nome:TEAMNAME,admin:[me()],membri:[]}).then(function(){
+    var src=LOCAL||SEED;if(!src)return;
+    var b=F.writeBatch(fs),n=0;
+    (src.players||[]).forEach(function(p){if(n<450){b.set(F.doc(fs,base()+"giocatori/"+p.id),plain(p));n++;}});
+    (src.matches||[]).forEach(function(m){if(n<450){b.set(F.doc(fs,base()+"partite/"+m.id),{data:m.data||"",avversario:m.avversario||"",convocati:m.convocati||[],nomi:m.nomi||[]});n++;}});
+    return b.commit();
+  }).then(function(){toast("Squadra attivata");}).catch(function(e){
+    gate("errore","Attivazione non riuscita ("+(e&&e.code||e)+"). Se la squadra è già stata attivata da un altro account, chiedi a lui di aggiungerti.");
+  });
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-g]");if(!b||!F)return;
+  var a=b.dataset.g;
+  if(a==="login")login();
+  else if(a==="esci"){stopAll();render();F.signOut(auth);}
+  else if(a==="riprova")location.reload();
+  else if(a==="attiva")activate(b);
+});
+
+Promise.all([import(FBV+"firebase-app.js"),import(FBV+"firebase-auth.js"),import(FBV+"firebase-firestore.js")]).then(function(mods){
+  F={};mods.forEach(function(m){Object.keys(m).forEach(function(k){F[k]=m[k];});});
+  var app=F.initializeApp(FBCONF);
+  auth=F.getAuth(app);
+  try{fs=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})});}
+  catch(e){fs=F.getFirestore(app);}
+  F.getRedirectResult(auth).catch(function(e){gate("errore","Accesso non riuscito ("+(e&&e.code||"errore")+"). Riprova.");});
+  F.onAuthStateChanged(auth,function(u){
+    stopAll();user=u;render();
+    if(!u){gate("login");return;}
+    watchTeam();
+  });
+}).catch(function(){
+  gate("errore","Non riesco a caricare l'app. Controlla la connessione a internet e riprova.");
+});
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}
+})();
+</script>
+</body>
+</html>
